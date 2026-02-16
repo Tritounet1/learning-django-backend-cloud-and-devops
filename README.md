@@ -180,6 +180,20 @@ from .models import Question
 admin.site.register(Question)
 ```
 
+### Create admin identifier
+
+```sh
+(mon_env) ➜  mysite git:(main) ✗ python manage.py createsuperuser
+Username: admin
+Email address: admin@gmail.com
+Password:
+Password (again):
+The password is too similar to the username.
+This password is too common.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+```
+
 ### Access to admin pannel
 
 `localhost:8000/admin`

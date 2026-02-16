@@ -1,5 +1,7 @@
 # Django backend for learn cloud and python backend basics
 
+Récrire tout au propre et simplifié :
+
 ## Django
 
 ### Create project
@@ -31,7 +33,7 @@ mysite/wsgi.py: An entry-point for WSGI-compatible web servers to serve your pro
 ### Run project dev
 
 ```sh
-source /mon_env/bin/activate
+source mon_env/bin/activate
 cd mysite
 python manage.py runserver
 ```
@@ -114,6 +116,78 @@ class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
+```
+
+### Migration
+
+```sh
+(mon_env) ➜  mysite git:(main) ✗ python manage.py makemigrations polls
+Migrations for 'polls':
+  polls/migrations/0001_initial.py
+    + Create model Question
+    + Create model Choice
+(mon_env) ➜  mysite git:(main) ✗ python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, polls, sessions
+Running migrations:
+  Applying polls.0001_initial... OK
+```
+
+There’s a command that will run the migrations for you and manage your database schema automatically - that’s called migrate, and we’ll come to it in a moment - but first, let’s see what SQL that migration would run. The sqlmigrate command takes migration names and returns their SQL:
+
+```sh
+(mon_env) ➜  mysite git:(main) ✗ python manage.py sqlmigrate polls 0001
+BEGIN;
+--
+-- Create model Question
+--
+CREATE TABLE "polls_question" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "question_text" varchar(200) NOT NULL, "pub_date" datetime NOT NULL);
+--
+-- Create model Choice
+--
+CREATE TABLE "polls_choice" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "choice_text" varchar(200) NOT NULL, "votes" integer NOT NULL, "question_id" bigint NOT NULL REFERENCES "polls_question" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE INDEX "polls_choice_question_id_c5b4b260" ON "polls_choice" ("question_id");
+COMMIT;
+```
+
+### Access to interractive shell :
+
+```sh
+(mon_env) ➜  mysite git:(main) ✗ python manage.py shell
+14 objects imported automatically (use -v 2 for details).
+
+Python 3.13.3 (main, Apr  8 2025, 13:54:08) [Clang 17.0.0 (clang-1700.0.13.3)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+NameError: name 'Questions' is not defined. Did you mean: 'Question'?
+>>> Question
+<class 'polls.models.Question'>
+>>> Question.objects.all()
+<QuerySet []>
+```
+
+### Make the poll app modifiable in the admin
+
+But where’s our poll app? It’s not displayed on the admin index page.
+
+Only one more thing to do: we need to tell the admin that Question objects have an admin interface. To do this, open the polls/admin.py file, and edit it to look like this:
+
+```py
+from django.contrib import admin
+
+from .models import Question
+
+admin.site.register(Question)
+```
+
+### Access to admin pannel
+
+`localhost:8000/admin`
+
+### Run test
+
+```sh
+python manage.py test polls
 ```
 
 ### Modify dependencies

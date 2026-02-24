@@ -210,6 +210,29 @@ python manage.py test polls
 pip install ...
 ```
 
+### Dispatch :
+
+```python
+class UserRegisterView(CreateView):
+    # ...
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("users:dashboard")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        # ...
+
+    def post(self, request):
+        # ...
+```
+
+Le dispatch() est appelée avant get() et post(), donc :
+
+- si user connecté → redirect immédiate
+- sinon → Django continue le flow normal du login
+
 ### Update requirements.txt
 
 ```sh
